@@ -585,6 +585,34 @@ function showToast(msg){const el=document.getElementById('toast');el.textContent
 document.addEventListener('keydown',e=>{
   if(e.key==='Escape'){closeModal();cancelAction();}
 });
+
+// Handle hash-based saves - fires even when page is already open
+window.addEventListener('hashchange', handleHash);
+
+async function handleHash(){
+  const hash = window.location.hash;
+  if(!hash) return;
+  window.location.hash = '';
+
+  if(hash.startsWith('#add=')){
+    const encoded = hash.slice(5);
+    try{
+      const item = JSON.parse(atob(encoded));
+      setSyncing(true);
+      const res = await api('POST', item);
+      items.push(res.item);
+      renderAll();
+      showToast('saved to your mind');
+    } catch(e){
+      console.error('Hash save failed:', e);
+      showToast('could not save');
+    }
+  } else if(hash.startsWith('#search=')){
+    const q = decodeURIComponent(hash.slice(8));
+    document.getElementById('ai-input').value = q;
+    setTimeout(()=>handleInput(), 300);
+  }
+}
 document.getElementById('ai-input')?.addEventListener('keydown',e=>{
   if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();handleInput();}
 });
@@ -624,6 +652,9 @@ window.addEventListener('load', async ()=>{
     }
 
     setTimeout(()=>enrichImages(), 1000);
+
+    // Also check hash on initial load
+    handleHash();
   } catch(e){
     console.error('Load error:', e);
     showApp();
