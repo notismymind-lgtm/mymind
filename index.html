@@ -495,12 +495,13 @@ function cardHTML(item) {
   if (item.image) {
     previewHTML = `<div class="card-preview-wrap"><img class="card-preview" src="${esc(item.image)}" alt="" onerror="this.parentElement.style.display='none'"></div>`;
   } else if (item.type === 'link' && item.url) {
-    // Use Google favicon service for a small preview indicator, and try og:image via allorigins
-    const ogUrl = 'https://api.allorigins.win/get?url=' + encodeURIComponent(item.url);
-    previewHTML = `<div class="card-preview-wrap" id="prev-${item.id}" style="height:36px;background:none;justify-content:flex-start;gap:6px;padding:0;">
-      <img src="https://www.google.com/s2/favicons?domain=${encodeURIComponent(new URL(item.url).hostname)}&sz=32" style="width:16px;height:16px;border-radius:3px;" onerror="this.style.display='none'">
-      <span style="font-size:11px;color:var(--muted);font-family:monospace;">${esc(urlDisplay)}</span>
-    </div>`;
+    try {
+      const hostname = new URL(item.url).hostname;
+      previewHTML = `<div class="card-preview-wrap" id="prev-${item.id}" style="height:36px;background:none;justify-content:flex-start;gap:6px;padding:0;">
+        <img src="https://www.google.com/s2/favicons?domain=${encodeURIComponent(hostname)}&sz=32" style="width:16px;height:16px;border-radius:3px;" onerror="this.style.display='none'">
+        <span style="font-size:11px;color:var(--muted);font-family:monospace;">${esc(urlDisplay)}</span>
+      </div>`;
+    } catch(e) { previewHTML = ''; }
   }
 
   return `<div class="item-card type-${item.type||'note'}" onclick="openItem('${item.id}')">
