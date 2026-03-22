@@ -590,15 +590,17 @@ document.getElementById('ai-input')?.addEventListener('keydown',e=>{
 });
 
 // ── INIT ─────────────────────────────────────────────────────
-window.addEventListener('load',()=>{
-  // Save URL params immediately before they get lost
+// Read params immediately on script parse, before load event
+(function(){
   const params = new URLSearchParams(window.location.search);
   const pendingAdd = params.get('add');
   const pendingSearch = params.get('search');
   if (pendingAdd) sessionStorage.setItem('mm_pending_add', pendingAdd);
   if (pendingSearch) sessionStorage.setItem('mm_pending_search', pendingSearch);
   if (pendingAdd || pendingSearch) window.history.replaceState({}, '', window.location.pathname);
+})();
 
+window.addEventListener('load',()=>{
   apiSecret = 'notis-mymind-2026';
   fetch(WORKER,{headers:{'Authorization':'Bearer '+apiSecret}})
     .then(r=>r.json())
