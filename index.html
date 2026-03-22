@@ -108,7 +108,7 @@
   .card-bottom { display: flex; align-items: center; gap: 5px; margin-top: 8px; flex-wrap: wrap; }
   .card-tag { background: var(--tag-bg); color: var(--tag-text); border-radius: 4px; padding: 1px 7px; font-size: 11px; }
   .card-date { font-size: 11px; color: var(--muted); margin-left: auto; opacity: 0.6; }
-  .card-actions { visibility: hidden; gap: 4px; flex-shrink: 0; display: flex; }
+  .card-actions { visibility: hidden; gap: 4px; display: flex; position: absolute; top: 10px; right: 10px; z-index: 2; }
   .item-card:hover .card-actions { visibility: visible; }
   .card-btn { background: var(--bg); border: 1px solid var(--border); color: var(--muted); width: 24px; height: 24px; border-radius: 4px; cursor: pointer; font-size: 11px; display: flex; align-items: center; justify-content: center; transition: all 0.12s; position: relative; }
   .card-btn[title]:hover::after { content: attr(title); position: absolute; bottom: 110%; left: 50%; transform: translateX(-50%); background: var(--text); color: #fff; font-size: 10px; padding: 3px 7px; border-radius: 4px; white-space: nowrap; pointer-events: none; font-family: var(--font); }
