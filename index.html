@@ -301,9 +301,9 @@ async function handleInput() {
   try {
     const summary = items.map(i => ({ id: i.id, title: i.title, note: i.note, url: i.url, tags: i.tags, type: i.type }));
 
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
+    const res = await fetch(WORKER + '/ai', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + apiSecret },
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
         max_tokens: 600,
@@ -336,12 +336,18 @@ Respond with ONLY a JSON object:
     });
 
     const data = await res.json();
-    const text = data.content[0].text.trim().replace(/```json|```/g,'').trim();
-    const result = JSON.parse(text);
+    let text = data.content[0].text.trim();
+    // Strip any markdown code blocks
+    text = text.replace(/^```json\s*/,'').replace(/^```\s*/,'').replace(/\s*```$/,'').trim();
+    // Extract JSON if wrapped in other text
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) throw new Error('No JSON in response: ' + text.slice(0,100));
+    const result = JSON.parse(jsonMatch[0]);
     await executeAction(result, inputEl);
 
   } catch(e) {
-    showResponse('<p>Something went wrong, try again.</p>');
+    showResponse('<p>Something went wrong: ' + esc(e.message) + '</p>');
+    console.error('MyMind error:', e);
   } finally {
     document.getElementById('ai-btn').disabled = false;
     setThinking(false);
