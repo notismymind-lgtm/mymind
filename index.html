@@ -513,6 +513,25 @@ window.addEventListener('load', () => {
 
 function checkURLSave() {
   const params = new URLSearchParams(window.location.search);
+  const searchQuery = params.get('search');
+  if (searchQuery) {
+    const searchEl = document.getElementById('search');
+    if (searchEl) { searchEl.value = searchQuery; filterItems(); }
+    window.history.replaceState({}, ', window.location.pathname);
+    return;
+  }
+  const encoded2 = params.get('add');
+  if (encoded2) {
+    try {
+      const item = JSON.parse(atob(encoded2));
+      pendingItem = item; showPreview(item);
+      window.history.replaceState({}, ', window.location.pathname);
+      showToast('review and confirm to save');
+    } catch(e) { console.error(e); }
+    return;
+  }
+  // legacy below
+  const params = new URLSearchParams(window.location.search);
   const encoded = params.get('add');
   if (!encoded) return;
   try {
