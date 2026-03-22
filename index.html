@@ -590,25 +590,40 @@ document.getElementById('ai-input')?.addEventListener('keydown',e=>{
 });
 
 // ── INIT ─────────────────────────────────────────────────────
-// Read params immediately on script parse, before load event
-(function(){
-  const params = new URLSearchParams(window.location.search);
-  const pendingAdd = params.get('add');
-  const pendingSearch = params.get('search');
-  if (pendingAdd) sessionStorage.setItem('mm_pending_add', pendingAdd);
-  if (pendingSearch) sessionStorage.setItem('mm_pending_search', pendingSearch);
-  if (pendingAdd || pendingSearch) window.history.replaceState({}, '', window.location.pathname);
-})();
-
 window.addEventListener('load',()=>{
   apiSecret = 'notis-mymind-2026';
+
+  // Grab params from URL right now before anything changes them
+  const urlParams = new URLSearchParams(window.location.search);
+  const addParam = urlParams.get('add');
+  const searchParam = urlParams.get('search');
+  if (addParam || searchParam) window.history.replaceState({}, '', window.location.pathname);
+
   fetch(WORKER,{headers:{'Authorization':'Bearer '+apiSecret}})
     .then(r=>r.json())
-    .then(d=>{
+    .then(async d=>{
       items=d.items||[];
       showApp();
       renderAll();
-      checkURLParams();
+
+      // Handle URL params now that we have data
+      if(searchParam){
+        document.getElementById('ai-input').value = searchParam;
+        setTimeout(()=>handleInput(), 300);
+      } else if(addParam){
+        try{
+          const item = JSON.parse(atob(addParam));
+          setSyncing(true);
+          const res = await api('POST', item);
+          items.push(res.item);
+          renderAll();
+          showToast('saved to your mind');
+        } catch(e){
+          console.error('Auto-save failed:', e);
+          showToast('could not save');
+        }
+      }
+
       setTimeout(()=>enrichImages(), 1000);
     })
     .catch((e)=>{
