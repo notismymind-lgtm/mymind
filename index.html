@@ -503,10 +503,29 @@ window.addEventListener('load', () => {
     showApp();
     const script = document.createElement('script');
     script.src = 'https://accounts.google.com/gsi/client';
-    script.onload = () => initDrive();
+    script.onload = async () => {
+      await initDrive();
+      checkURLSave();
+    };
     document.head.appendChild(script);
   }
 });
+
+function checkURLSave() {
+  const params = new URLSearchParams(window.location.search);
+  const encoded = params.get('add');
+  if (!encoded) return;
+  try {
+    const item = JSON.parse(atob(encoded));
+    pendingItem = item;
+    showPreview(item);
+    // Clean URL without reloading
+    window.history.replaceState({}, '', window.location.pathname);
+    showToast('review and confirm to save');
+  } catch(e) {
+    console.error('Could not parse URL item', e);
+  }
+}
 </script>
 </body>
 </html>
