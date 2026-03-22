@@ -600,8 +600,18 @@ window.addEventListener('load',()=>{
   apiSecret = 'notis-mymind-2026';
   fetch(WORKER,{headers:{'Authorization':'Bearer '+apiSecret}})
     .then(r=>r.json())
-    .then(d=>{items=d.items||[];showApp();checkURLParams();enrichImages();})
-    .catch(()=>{ document.getElementById('app').style.display='block'; });
+    .then(d=>{
+      items=d.items||[];
+      showApp();
+      renderAll();
+      checkURLParams();
+      setTimeout(()=>enrichImages(), 1000);
+    })
+    .catch((e)=>{
+      console.error('Load error:', e);
+      document.getElementById('app').style.display='block';
+      renderAll();
+    });
 });
 
 
