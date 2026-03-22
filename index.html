@@ -39,7 +39,7 @@
   .btn-pin:hover { opacity: 0.78; }
 
   /* APP */
-  #app { display: none; }
+  #app { display: block; }
   .wrap { max-width: var(--max); margin: 0 auto; padding: 0 1.5rem; }
 
   header { border-bottom: 1px solid var(--border); background: rgba(245,244,240,0.95); backdrop-filter: blur(10px); position: sticky; top: 0; z-index: 100; }
@@ -48,8 +48,7 @@
   .header-right { display: flex; align-items: center; gap: 10px; }
   .sync-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); }
   .sync-dot.syncing { background: var(--accent); animation: pulse 1s infinite; }
-  .btn-lock { background: none; border: none; color: var(--muted); font-size: 13px; cursor: pointer; padding: 4px 6px; border-radius: 4px; transition: color 0.15s; font-family: var(--font); }
-  .btn-lock:hover { color: var(--text); }
+
 
   #ai-bar { padding: 12px 0 10px; border-bottom: 1px solid var(--border); background: var(--surface); }
   .ai-bar-inner { max-width: var(--max); margin: 0 auto; padding: 0 1.5rem; display: flex; gap: 8px; align-items: flex-end; }
@@ -153,18 +152,7 @@
 </head>
 <body>
 
-<!-- PIN SCREEN -->
-<div id="pin-screen">
-  <div class="brand">
-    <h1>mymind</h1>
-    <p>your personal knowledge store</p>
-  </div>
-  <div class="pin-form">
-    <input type="password" id="pin-input" placeholder="enter your key" autocomplete="off" onkeydown="if(event.key==='Enter')unlock()">
-    <div class="pin-error" id="pin-error">incorrect key</div>
-    <button class="btn-pin" onclick="unlock()">unlock</button>
-  </div>
-</div>
+
 
 <!-- APP -->
 <div id="app">
@@ -173,7 +161,6 @@
       <div class="logo">mymind</div>
       <div class="header-right">
         <span class="sync-dot" id="sync-dot"></span>
-        <button class="btn-lock" onclick="lock()" title="Lock">lock</button>
       </div>
     </div>
   </header>
@@ -602,15 +589,24 @@ document.getElementById('ai-input')?.addEventListener('keydown',e=>{
 
 // ── INIT ─────────────────────────────────────────────────────
 window.addEventListener('load',()=>{
-  const saved=sessionStorage.getItem('mm_key');
-  if(saved){
-    apiSecret=saved;
-    fetch(WORKER,{headers:{'Authorization':'Bearer '+saved}})
-      .then(r=>r.json())
-      .then(d=>{items=d.items||[];showApp();checkURLParams();})
-      .catch(()=>{});
-  }
+  // Save URL params immediately before they get lost
+  const params = new URLSearchParams(window.location.search);
+  const pendingAdd = params.get('add');
+  const pendingSearch = params.get('search');
+  if (pendingAdd) sessionStorage.setItem('mm_pending_add', pendingAdd);
+  if (pendingSearch) sessionStorage.setItem('mm_pending_search', pendingSearch);
+  if (pendingAdd || pendingSearch) window.history.replaceState({}, '', window.location.pathname);
+
+  apiSecret = 'notis-mymind-2026';
+  fetch(WORKER,{headers:{'Authorization':'Bearer '+apiSecret}})
+    .then(r=>r.json())
+    .then(d=>{items=d.items||[];showApp();checkURLParams();enrichImages();})
+    .catch(()=>{ document.getElementById('app').style.display='block'; });
 });
+
+function showApp(){
+  document.getElementById('app').style.display='block';
+}
 
 function checkURLParams(){
   const params=new URLSearchParams(window.location.search);
