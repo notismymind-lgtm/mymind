@@ -108,7 +108,7 @@
   .card-bottom { display: flex; align-items: center; gap: 5px; margin-top: 8px; flex-wrap: wrap; }
   .card-tag { background: var(--tag-bg); color: var(--tag-text); border-radius: 4px; padding: 1px 7px; font-size: 11px; }
   .card-date { font-size: 11px; color: var(--muted); margin-left: auto; opacity: 0.6; }
-  .card-actions { visibility: hidden; gap: 4px; display: flex; position: absolute; top: 10px; right: 10px; z-index: 2; }
+  .card-actions { visibility: hidden; gap: 4px; display: flex; flex-shrink: 0; }
   .item-card:hover .card-actions { visibility: visible; }
   .card-btn { background: var(--bg); border: 1px solid var(--border); color: var(--muted); width: 24px; height: 24px; border-radius: 4px; cursor: pointer; font-size: 11px; display: flex; align-items: center; justify-content: center; transition: all 0.12s; position: relative; }
   .card-btn[title]:hover::after { content: attr(title); position: absolute; bottom: 110%; left: 50%; transform: translateX(-50%); background: var(--text); color: #fff; font-size: 10px; padding: 3px 7px; border-radius: 4px; white-space: nowrap; pointer-events: none; font-family: var(--font); }
@@ -505,17 +505,18 @@ function cardHTML(item) {
   }
 
   return `<div class="item-card type-${item.type||'note'}" onclick="openItem('${item.id}')">
-    <div class="card-actions">
-      <button class="card-btn" onclick="event.stopPropagation();editItem('${item.id}')" title="Edit">✎</button>
-      <button class="card-btn del" onclick="event.stopPropagation();deleteItem('${item.id}')" title="Delete">✕</button>
-    </div>
     ${previewHTML}
     <div class="card-top">
-      <div style="min-width:0;flex:1;">
-        ${item.title?`<div class="card-title"><span class="type-icon">${typeIcon(item)}</span>${esc(item.title)}</div>`:''}
-        ${item.url?`<div class="card-url">${esc(urlDisplay)}</div>`:''}
+      <div style="min-width:0;flex:1;display:flex;align-items:center;gap:6px;">
+        <span class="type-icon">${typeIcon(item)}</span>
+        ${item.title?`<span class="card-title">${esc(item.title)}</span>`:''}
+      </div>
+      <div class="card-actions">
+        <button class="card-btn" onclick="event.stopPropagation();editItem('${item.id}')" title="Edit">✎</button>
+        <button class="card-btn del" onclick="event.stopPropagation();deleteItem('${item.id}')" title="Delete">✕</button>
       </div>
     </div>
+    ${item.url?`<div class="card-url">${esc(urlDisplay)}</div>`:''}
     ${item.note?`<div class="card-note">${esc(item.note)}</div>`:''}
     <div class="card-bottom">${tagsHTML}<span class="card-date">${dateStr}</span></div>
   </div>`;
