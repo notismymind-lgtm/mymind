@@ -336,12 +336,13 @@ Respond with ONLY a JSON object:
     });
 
     const data = await res.json();
-    let text = data.content[0].text.trim();
-    // Strip any markdown code blocks
+    console.log('AI response:', JSON.stringify(data).slice(0,300));
+    const rawContent = data.content || data.choices?.[0]?.message?.content;
+    if (!rawContent) throw new Error('Empty response: ' + JSON.stringify(data).slice(0,200));
+    let text = (Array.isArray(rawContent) ? rawContent[0].text : rawContent).trim();
     text = text.replace(/^```json\s*/,'').replace(/^```\s*/,'').replace(/\s*```$/,'').trim();
-    // Extract JSON if wrapped in other text
     const jsonMatch = text.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) throw new Error('No JSON in response: ' + text.slice(0,100));
+    if (!jsonMatch) throw new Error('No JSON: ' + text.slice(0,100));
     const result = JSON.parse(jsonMatch[0]);
     await executeAction(result, inputEl);
 
