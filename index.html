@@ -8,45 +8,50 @@
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
-    --bg: #f5f4f0;
-    --surface: #ffffff;
-    --border: #e8e6e1;
-    --border2: #d0cdc6;
-    --text: #1a1917;
-    --muted: #8a8680;
-    --accent: #2563eb;
-    --accent-dim: rgba(37,99,235,0.07);
-    --tag-bg: #eeecea;
-    --tag-text: #5a5754;
-    --danger: #dc2626;
-    --green: #16a34a;
-    --radius: 8px;
-    --font: 'DM Sans', system-ui, sans-serif;
-    --max: 680px;
+    --bg: #f5f4f0; --surface: #ffffff; --border: #e8e6e1; --border2: #d0cdc6;
+    --text: #1a1917; --muted: #8a8680; --accent: #2563eb;
+    --accent-dim: rgba(37,99,235,0.07); --tag-bg: #eeecea; --tag-text: #5a5754;
+    --danger: #dc2626; --green: #16a34a; --radius: 8px;
+    --font: 'DM Sans', system-ui, sans-serif; --max: 680px;
   }
   body { background: var(--bg); color: var(--text); font-family: var(--font); font-size: 14px; min-height: 100vh; line-height: 1.6; }
 
-  /* AUTH */
-  #auth-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; gap: 1.5rem; padding: 2rem; }
-  .brand h1 { font-size: 1.5rem; font-weight: 300; letter-spacing: -0.03em; color: var(--text); text-align: center; margin-bottom: 4px; }
+  /* PIN SCREEN */
+  #pin-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; gap: 1.5rem; padding: 2rem; }
+  .brand h1 { font-size: 1.5rem; font-weight: 300; letter-spacing: -0.03em; text-align: center; margin-bottom: 4px; }
   .brand p { color: var(--muted); font-size: 12px; text-align: center; }
-  .auth-btn { display: flex; align-items: center; gap: 10px; background: var(--surface); border: 1px solid var(--border); color: var(--text); padding: 10px 20px; border-radius: var(--radius); cursor: pointer; font-family: var(--font); font-size: 13px; font-weight: 500; transition: all 0.15s; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
-  .auth-btn:hover { border-color: var(--border2); box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-  .auth-btn svg { width: 16px; height: 16px; flex-shrink: 0; }
+  .pin-form { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+  #pin-input {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 10px 16px; font-family: var(--font); font-size: 15px; font-weight: 500;
+    text-align: center; letter-spacing: 0.2em; width: 180px; outline: none;
+    transition: border 0.15s; color: var(--text);
+  }
+  #pin-input:focus { border-color: var(--accent); }
+  #pin-input::placeholder { letter-spacing: 0; font-weight: 400; font-size: 13px; color: var(--muted); }
+  .pin-error { font-size: 12px; color: var(--danger); display: none; }
+  .pin-error.show { display: block; }
+  .btn-pin {
+    background: var(--text); color: #fff; border: none; padding: 9px 24px;
+    border-radius: var(--radius); font-family: var(--font); font-size: 13px;
+    font-weight: 500; cursor: pointer; transition: opacity 0.15s; width: 180px;
+  }
+  .btn-pin:hover { opacity: 0.78; }
 
   /* APP */
   #app { display: none; }
   .wrap { max-width: var(--max); margin: 0 auto; padding: 0 1.5rem; }
 
-  /* HEADER */
   header { border-bottom: 1px solid var(--border); background: rgba(245,244,240,0.95); backdrop-filter: blur(10px); position: sticky; top: 0; z-index: 100; }
   .header-inner { max-width: var(--max); margin: 0 auto; padding: 0 1.5rem; height: 48px; display: flex; align-items: center; justify-content: space-between; }
   .logo { font-size: 14px; font-weight: 500; letter-spacing: -0.01em; }
-  .sync-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); display: inline-block; }
+  .header-right { display: flex; align-items: center; gap: 10px; }
+  .sync-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); }
   .sync-dot.syncing { background: var(--accent); animation: pulse 1s infinite; }
+  .btn-lock { background: none; border: none; color: var(--muted); font-size: 13px; cursor: pointer; padding: 4px 6px; border-radius: 4px; transition: color 0.15s; font-family: var(--font); }
+  .btn-lock:hover { color: var(--text); }
 
-  /* AI INPUT */
-  #ai-bar { padding: 14px 0 10px; border-bottom: 1px solid var(--border); background: var(--surface); }
+  #ai-bar { padding: 12px 0 10px; border-bottom: 1px solid var(--border); background: var(--surface); }
   .ai-bar-inner { max-width: var(--max); margin: 0 auto; padding: 0 1.5rem; display: flex; gap: 8px; align-items: flex-end; }
   #ai-input {
     flex: 1; background: var(--bg); border: 1px solid var(--border);
@@ -57,64 +62,50 @@
   #ai-input:focus { border-color: var(--accent); background: var(--surface); }
   #ai-input::placeholder { color: var(--muted); }
   #ai-btn {
-    background: var(--text); color: #fff; border: none;
-    padding: 0 16px; border-radius: 8px; font-family: var(--font);
-    font-size: 12px; font-weight: 500; cursor: pointer; transition: opacity 0.15s;
-    height: 40px; white-space: nowrap; flex-shrink: 0;
+    background: var(--text); color: #fff; border: none; padding: 0 16px;
+    border-radius: 8px; font-family: var(--font); font-size: 13px; font-weight: 500;
+    cursor: pointer; transition: opacity 0.15s; height: 40px; white-space: nowrap; flex-shrink: 0;
   }
   #ai-btn:hover { opacity: 0.78; }
   #ai-btn:disabled { opacity: 0.3; cursor: not-allowed; }
-  .ai-hint { max-width: var(--max); margin: 0 auto; padding: 5px 1.5rem 0; font-size: 11px; color: var(--muted); background: var(--surface); }
 
-  /* THINKING */
   @keyframes pulse { 0%,100%{opacity:0.3} 50%{opacity:1} }
-  #thinking {
-    max-width: var(--max); margin: 0 auto; padding: 10px 1.5rem;
-    font-size: 12px; color: var(--muted); display: none; align-items: center; gap: 5px;
-  }
+  #thinking { max-width: var(--max); margin: 0 auto; padding: 10px 1.5rem; font-size: 12px; color: var(--muted); display: none; align-items: center; gap: 5px; }
   #thinking.on { display: flex; }
   .td { width: 4px; height: 4px; border-radius: 50%; background: var(--muted); animation: pulse 1.2s infinite; }
   .td:nth-child(2){animation-delay:.2s} .td:nth-child(3){animation-delay:.4s}
 
-  /* AI RESPONSE */
-  #ai-response {
-    max-width: var(--max); margin: 10px auto 0; padding: 0 1.5rem;
-    display: none;
-  }
+  #ai-response { max-width: var(--max); margin: 10px auto 0; padding: 0 1.5rem; display: none; }
   #ai-response.on { display: block; }
-  .ai-msg {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius); padding: 12px 14px;
-    font-size: 13px; line-height: 1.6; color: var(--text);
-  }
-  .ai-msg .confirm-actions { display: flex; gap: 6px; margin-top: 10px; }
+  .ai-msg { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 14px; font-size: 13px; line-height: 1.6; }
+  .confirm-actions { display: flex; gap: 6px; margin-top: 10px; }
   .btn-yes { background: var(--accent); color: #fff; border: none; padding: 6px 14px; border-radius: 6px; font-family: var(--font); font-size: 12px; font-weight: 500; cursor: pointer; transition: opacity 0.15s; }
   .btn-yes:hover { opacity: 0.85; }
   .btn-no { background: none; border: 1px solid var(--border); color: var(--muted); padding: 6px 12px; border-radius: 6px; font-family: var(--font); font-size: 12px; cursor: pointer; transition: all 0.15s; }
   .btn-no:hover { border-color: var(--danger); color: var(--danger); }
 
-  /* ITEMS */
   main { padding: 1.5rem 0 4rem; }
   #tags-bar { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 1rem; }
   .tag-pill { background: var(--tag-bg); color: var(--tag-text); border: 1px solid transparent; border-radius: 20px; padding: 3px 10px; font-size: 11px; cursor: pointer; transition: all 0.12s; font-family: var(--font); }
   .tag-pill:hover { border-color: var(--border2); }
   .tag-pill.active { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
 
-  #items-list { display: flex; flex-direction: column; gap: 6px; }
+  .list-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+  .btn-add { background: var(--accent); color: #fff; border: none; padding: 6px 14px; border-radius: 6px; font-family: var(--font); font-size: 12px; font-weight: 500; cursor: pointer; transition: opacity 0.15s; }
+  .btn-add:hover { opacity: 0.85; }
 
+  #items-list { display: flex; flex-direction: column; gap: 6px; }
   .item-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 14px; cursor: pointer; transition: border-color 0.12s; position: relative; }
   .item-card:hover { border-color: var(--border2); }
   .item-card.type-link { border-left: 2px solid #93c5fd; }
   .item-card.type-note { border-left: 2px solid var(--border2); }
-
   .card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
   .card-title { font-size: 13px; font-weight: 500; color: var(--text); line-height: 1.4; }
-  .card-url { font-size: 11px; color: var(--accent); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 300px; }
+  .card-url { font-size: 11px; color: var(--accent); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 300px; }
   .card-note { font-size: 12px; color: var(--muted); margin-top: 5px; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
   .card-bottom { display: flex; align-items: center; gap: 5px; margin-top: 8px; flex-wrap: wrap; }
   .card-tag { background: var(--tag-bg); color: var(--tag-text); border-radius: 4px; padding: 1px 7px; font-size: 11px; }
   .card-date { font-size: 11px; color: var(--muted); margin-left: auto; opacity: 0.6; }
-
   .card-actions { display: none; gap: 4px; flex-shrink: 0; }
   .item-card:hover .card-actions { display: flex; }
   .card-btn { background: var(--bg); border: 1px solid var(--border); color: var(--muted); width: 24px; height: 24px; border-radius: 4px; cursor: pointer; font-size: 11px; display: flex; align-items: center; justify-content: center; transition: all 0.12s; }
@@ -124,7 +115,6 @@
   #empty { display: none; text-align: center; padding: 4rem 2rem; color: var(--muted); }
   #empty p { font-size: 13px; }
 
-  /* MODAL */
   .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.25); z-index: 200; align-items: center; justify-content: center; padding: 1rem; }
   .modal-overlay.open { display: flex; }
   .modal { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.4rem; width: 100%; max-width: 460px; max-height: 90vh; overflow-y: auto; box-shadow: 0 8px 32px rgba(0,0,0,0.1); }
@@ -143,29 +133,23 @@
   .btn-cancel { background: none; border: 1px solid var(--border); color: var(--muted); padding: 7px 14px; border-radius: 6px; font-family: var(--font); font-size: 12px; cursor: pointer; transition: all 0.15s; }
   .btn-cancel:hover { border-color: var(--border2); color: var(--text); }
 
-  /* TOAST */
   #toast { position: fixed; bottom: 1.5rem; right: 1.5rem; background: var(--text); color: #fff; padding: 8px 14px; border-radius: 6px; font-size: 12px; font-weight: 500; opacity: 0; transform: translateY(6px); transition: all 0.2s; z-index: 300; pointer-events: none; }
   #toast.show { opacity: 1; transform: translateY(0); }
 </style>
 </head>
 <body>
 
-<!-- AUTH -->
-<div id="auth-screen">
+<!-- PIN SCREEN -->
+<div id="pin-screen">
   <div class="brand">
     <h1>mymind</h1>
     <p>your personal knowledge store</p>
   </div>
-  <button class="auth-btn" onclick="signIn()">
-    <svg viewBox="0 0 24 24" fill="none">
-      <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-      <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-      <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
-      <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
-    </svg>
-    Sign in with Google
-  </button>
-  <p style="font-size:11px;color:var(--muted);text-align:center;max-width:240px;line-height:1.7;">Data stored in your own Google Drive. Nothing else.</p>
+  <div class="pin-form">
+    <input type="password" id="pin-input" placeholder="enter your key" autocomplete="off" onkeydown="if(event.key==='Enter')unlock()">
+    <div class="pin-error" id="pin-error">incorrect key</div>
+    <button class="btn-pin" onclick="unlock()">unlock</button>
+  </div>
 </div>
 
 <!-- APP -->
@@ -173,17 +157,19 @@
   <header>
     <div class="header-inner">
       <div class="logo">mymind</div>
-      <span class="sync-dot" id="sync-dot" title="synced"></span>
+      <div class="header-right">
+        <span class="sync-dot" id="sync-dot"></span>
+        <button class="btn-lock" onclick="lock()" title="Lock">lock</button>
+      </div>
     </div>
   </header>
 
   <div id="ai-bar">
     <div class="ai-bar-inner">
-      <textarea id="ai-input" rows="1" placeholder="save a link, search for something, ask anything about your saved items..."></textarea>
+      <textarea id="ai-input" rows="1" placeholder="save a link, find something, ask anything..."></textarea>
       <button id="ai-btn" onclick="handleInput()">↵</button>
     </div>
   </div>
-
 
   <div id="thinking" class="wrap"><div class="td"></div><div class="td"></div><div class="td"></div><span style="margin-left:5px;">thinking...</span></div>
   <div id="ai-response" class="wrap"></div>
@@ -191,11 +177,12 @@
   <div class="wrap">
     <main>
       <div id="tags-bar"></div>
-      <div style="display:flex;justify-content:flex-end;margin-bottom:10px;">
-        <button class="btn-save" style="font-size:12px;padding:6px 14px;" onclick="openModal()">+ add manually</button>
+      <div class="list-header">
+        <div id="item-count" style="font-size:12px;color:var(--muted);"></div>
+        <button class="btn-add" onclick="openModal()">+ add</button>
       </div>
       <div id="items-list"></div>
-      <div id="empty"><p>nothing saved yet — type anything above to get started</p></div>
+      <div id="empty"><p>nothing saved yet</p></div>
     </main>
   </div>
 </div>
@@ -234,70 +221,67 @@
 <div id="toast"></div>
 
 <script>
-const CLIENT_ID = '276501368476-1g0q6nrsbg58dc43ovih415793loe1o1.apps.googleusercontent.com';
-const SCOPES = 'https://www.googleapis.com/auth/drive.file';
-const FILE_ID = '1Xw5n3nDHVR8a-MwC3YKIUEp0GSQyQL5w';
+const WORKER = 'https://mymind-api.notismymind.workers.dev';
 
-let accessToken = null;
+let apiSecret = null;
 let items = [];
 let editingId = null;
 let activeType = 'link';
 let activeTag = null;
 let pendingAction = null;
 
-// ── AUTH ─────────────────────────────────────────────────────
-function signIn() {
-  const s = document.createElement('script');
-  s.src = 'https://accounts.google.com/gsi/client';
-  s.onload = () => {
-    google.accounts.oauth2.initTokenClient({
-      client_id: CLIENT_ID, scope: SCOPES,
-      callback: async (r) => {
-        if (r.error) { showToast('auth error'); return; }
-        accessToken = r.access_token;
-        localStorage.setItem('mm_token', accessToken);
-        showApp(); await initDrive();
-      }
-    }).requestAccessToken();
-  };
-  document.head.appendChild(s);
+// ── PIN / LOCK ────────────────────────────────────────────────
+async function unlock() {
+  const pin = document.getElementById('pin-input').value.trim();
+  if (!pin) return;
+
+  // Test the key against the Worker
+  try {
+    const res = await fetch(WORKER, { headers: { 'Authorization': 'Bearer ' + pin } });
+    if (res.status === 401) {
+      document.getElementById('pin-error').classList.add('show');
+      document.getElementById('pin-input').value = '';
+      return;
+    }
+    const data = await res.json();
+    apiSecret = pin;
+    sessionStorage.setItem('mm_key', pin);
+    items = data.items || [];
+    showApp();
+  } catch(e) {
+    document.getElementById('pin-error').classList.add('show');
+    document.getElementById('pin-error').textContent = 'could not connect';
+  }
 }
 
-function tryAutoAuth() {
-  const t = localStorage.getItem('mm_token');
-  if (!t) return false;
-  accessToken = t; return true;
+function lock() {
+  apiSecret = null;
+  sessionStorage.removeItem('mm_key');
+  items = [];
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('pin-screen').style.display = 'flex';
+  document.getElementById('pin-input').value = '';
+  document.getElementById('pin-error').classList.remove('show');
 }
 
 function showApp() {
-  document.getElementById('auth-screen').style.display = 'none';
+  document.getElementById('pin-screen').style.display = 'none';
   document.getElementById('app').style.display = 'block';
+  renderAll();
+  setSyncing(false);
 }
 
-// ── DRIVE ────────────────────────────────────────────────────
-async function driveReq(url, opts={}) {
-  const res = await fetch(url, { ...opts, headers: { 'Authorization': 'Bearer '+accessToken, ...(opts.headers||{}) } });
-  if (res.status===401) { localStorage.removeItem('mm_token'); location.reload(); }
-  return res;
-}
-
-async function initDrive() {
+// ── WORKER API ───────────────────────────────────────────────
+async function api(method, body, query='') {
   setSyncing(true);
-  try {
-    const res = await driveReq(`https://www.googleapis.com/drive/v3/files/${FILE_ID}?alt=media`);
-    if (res.ok) { const d = await res.json(); items = d.items||[]; }
-    else items = [];
-  } catch(e) { items = []; }
-  renderAll(); setSyncing(false);
-}
-
-async function saveToDrive() {
-  setSyncing(true);
-  await driveReq(`https://www.googleapis.com/upload/drive/v3/files/${FILE_ID}?uploadType=media`, {
-    method: 'PATCH', headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ items })
+  const res = await fetch(WORKER + query, {
+    method,
+    headers: { 'Authorization': 'Bearer ' + apiSecret, 'Content-Type': 'application/json' },
+    ...(body ? { body: JSON.stringify(body) } : {})
   });
   setSyncing(false);
+  if (!res.ok) throw new Error('API error ' + res.status);
+  return res.json();
 }
 
 function setSyncing(on) {
@@ -310,39 +294,12 @@ async function handleInput() {
   const raw = inputEl.value.trim();
   if (!raw) return;
 
-  const btn = document.getElementById('ai-btn');
-  btn.disabled = true;
+  document.getElementById('ai-btn').disabled = true;
   setThinking(true);
   clearResponse();
 
   try {
-    const itemsSummary = items.map(i => ({ id: i.id, title: i.title, note: i.note, url: i.url, tags: i.tags, type: i.type }));
-
-    const systemPrompt = `You are the AI brain of a personal knowledge app called MyMind. The user has ${items.length} saved items.
-
-You can do these actions:
-- SAVE: user wants to save a new link or note
-- SEARCH: user wants to find something in their saved items
-- FILTER: user wants to filter by tag or type
-- DELETE: user wants to delete an item
-- SHOW_ALL: user wants to see all items / clear filter
-- CHAT: user is asking a question about their saved items
-
-Current items: ${JSON.stringify(itemsSummary)}
-
-Respond with ONLY a JSON object:
-{
-  "action": "SAVE" | "SEARCH" | "FILTER" | "DELETE" | "SHOW_ALL" | "CHAT",
-  "message": "short friendly response to show the user (plain text, no markdown)",
-  "data": {
-    // for SAVE: { type, title (plain ASCII, no em dashes), url, note, tags }
-    // for SEARCH: { ids: [...matching item ids in order of relevance] }
-    // for FILTER: { tag: "tagname" } or { type: "link"|"note" }
-    // for DELETE: { id: "item id", title: "item title for confirmation" }
-    // for SHOW_ALL: {}
-    // for CHAT: {}
-  }
-}`;
+    const summary = items.map(i => ({ id: i.id, title: i.title, note: i.note, url: i.url, tags: i.tags, type: i.type }));
 
     const res = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
@@ -350,7 +307,30 @@ Respond with ONLY a JSON object:
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
         max_tokens: 600,
-        system: systemPrompt,
+        system: `You are the AI brain of a personal knowledge app called MyMind. The user has ${items.length} saved items.
+
+Actions you can perform:
+- SAVE: user wants to save a new link or note
+- SEARCH: user wants to find something
+- FILTER: user wants to filter by tag or type
+- DELETE: user wants to delete an item
+- SHOW_ALL: user wants to see everything / clear filter
+- CHAT: general question about saved items
+
+Current items: ${JSON.stringify(summary)}
+
+Respond with ONLY a JSON object:
+{
+  "action": "SAVE|SEARCH|FILTER|DELETE|SHOW_ALL|CHAT",
+  "message": "short friendly response (plain text)",
+  "data": {
+    // SAVE: { type, title (plain ASCII, no special chars), url, note, tags[] }
+    // SEARCH: { ids: [matching item ids by relevance] }
+    // FILTER: { tag: "name" } or { type: "link|note" }
+    // DELETE: { id: "item id", title: "item title" }
+    // SHOW_ALL or CHAT: {}
+  }
+}`,
         messages: [{ role: 'user', content: raw }]
       })
     });
@@ -358,28 +338,26 @@ Respond with ONLY a JSON object:
     const data = await res.json();
     const text = data.content[0].text.trim().replace(/```json|```/g,'').trim();
     const result = JSON.parse(text);
-
-    await executeAction(result, raw, inputEl);
+    await executeAction(result, inputEl);
 
   } catch(e) {
     showResponse('<p>Something went wrong, try again.</p>');
-    console.error(e);
   } finally {
-    btn.disabled = false;
+    document.getElementById('ai-btn').disabled = false;
     setThinking(false);
   }
 }
 
-async function executeAction(result, raw, inputEl) {
+async function executeAction(result, inputEl) {
   const { action, message, data } = result;
 
   if (action === 'SAVE') {
     pendingAction = { type: 'SAVE', item: data };
     showResponse(`
       <div style="margin-bottom:10px;">${esc(message)}</div>
-      <div style="font-size:12px;color:var(--muted);margin-bottom:4px;"><strong style="color:var(--text)">${esc(data.title)}</strong></div>
+      <div style="font-size:13px;font-weight:500;margin-bottom:3px;">${esc(data.title)}</div>
       ${data.url ? `<div style="font-size:11px;color:var(--accent);margin-bottom:4px;font-family:monospace;">${esc(data.url)}</div>` : ''}
-      ${data.note ? `<div style="font-size:12px;color:var(--muted);margin-bottom:6px;">${esc(data.note)}</div>` : ''}
+      ${data.note ? `<div style="font-size:12px;color:var(--muted);margin-bottom:8px;">${esc(data.note)}</div>` : ''}
       <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:10px;">${(data.tags||[]).map(t=>`<span class="card-tag">${esc(t)}</span>`).join('')}</div>
       <div class="confirm-actions">
         <button class="btn-yes" onclick="confirmAction()">save</button>
@@ -399,14 +377,14 @@ async function executeAction(result, raw, inputEl) {
     `);
 
   } else if (action === 'SEARCH') {
-    const matched = (data.ids||[]).map(id => items.find(i=>i.id===id)).filter(Boolean);
+    const matched = (data.ids||[]).map(id=>items.find(i=>i.id===id)).filter(Boolean);
     renderAll(matched);
     showResponse(`<div>${esc(message)}</div>`);
-    if (matched.length > 0) setTimeout(clearResponse, 3000);
+    setTimeout(clearResponse, 3000);
     inputEl.value = '';
 
   } else if (action === 'FILTER') {
-    if (data.tag) { activeTag = data.tag; }
+    if (data.tag) activeTag = data.tag;
     renderAll();
     showResponse(`<div>${esc(message)}</div>`);
     setTimeout(clearResponse, 2500);
@@ -419,7 +397,7 @@ async function executeAction(result, raw, inputEl) {
     inputEl.value = '';
 
   } else if (action === 'CHAT') {
-    showResponse(`<div style="line-height:1.6;">${esc(message)}</div>`);
+    showResponse(`<div>${esc(message)}</div>`);
     inputEl.value = '';
   }
 }
@@ -427,54 +405,39 @@ async function executeAction(result, raw, inputEl) {
 async function confirmAction() {
   if (!pendingAction) return;
   if (pendingAction.type === 'SAVE') {
-    const item = { ...pendingAction.item, id: Date.now().toString(36)+Math.random().toString(36).slice(2), created: new Date().toISOString() };
-    items.push(item);
-    renderAll(); await saveToDrive();
-    showToast('saved');
+    const res = await api('POST', pendingAction.item);
+    items.push(res.item);
+    renderAll(); showToast('saved');
   } else if (pendingAction.type === 'DELETE') {
+    await api('DELETE', null, '?id='+pendingAction.id);
     items = items.filter(i=>i.id!==pendingAction.id);
-    renderAll(); await saveToDrive();
-    showToast('deleted');
+    renderAll(); showToast('deleted');
   }
   pendingAction = null;
   clearResponse();
 }
 
 function cancelAction() { pendingAction = null; clearResponse(); }
-
-function setThinking(on) {
-  document.getElementById('thinking').className = on ? 'wrap on' : 'wrap';
-}
-
-function showResponse(html) {
-  const el = document.getElementById('ai-response');
-  el.innerHTML = `<div class="ai-msg">${html}</div>`;
-  el.className = 'wrap on';
-}
-
-function clearResponse() {
-  const el = document.getElementById('ai-response');
-  el.className = 'wrap';
-  el.innerHTML = '';
-}
+function setThinking(on) { document.getElementById('thinking').className = on ? 'wrap on' : 'wrap'; }
+function showResponse(html) { const el=document.getElementById('ai-response'); el.innerHTML=`<div class="ai-msg">${html}</div>`; el.className='wrap on'; }
+function clearResponse() { const el=document.getElementById('ai-response'); el.className='wrap'; el.innerHTML=''; }
 
 // ── RENDER ───────────────────────────────────────────────────
 function renderAll(filteredOverride) {
-  let filtered = filteredOverride || [...items].reverse().filter(item => {
-    return !activeTag || (item.tags&&item.tags.includes(activeTag));
-  });
-
+  let filtered = filteredOverride || [...items].reverse().filter(i => !activeTag||(i.tags&&i.tags.includes(activeTag)));
   const list = document.getElementById('items-list');
   const empty = document.getElementById('empty');
+  const count = document.getElementById('item-count');
+  count.textContent = filtered.length + ' item' + (filtered.length!==1?'s':'');
   if (filtered.length===0) { list.innerHTML=''; empty.style.display='block'; }
   else { empty.style.display='none'; list.innerHTML=filtered.map(cardHTML).join(''); }
   renderTags();
 }
 
 function cardHTML(item) {
-  const tagsHTML = (item.tags||[]).map(t=>`<span class="card-tag">${esc(t)}</span>`).join('');
-  const dateStr = item.created ? new Date(item.created).toLocaleDateString('en-GB',{day:'numeric',month:'short'}) : '';
-  const urlDisplay = item.url ? item.url.replace(/^https?:\/\//,'').split('/')[0] : '';
+  const tagsHTML=(item.tags||[]).map(t=>`<span class="card-tag">${esc(t)}</span>`).join('');
+  const dateStr=item.created?new Date(item.created).toLocaleDateString('en-GB',{day:'numeric',month:'short'}):'';
+  const urlDisplay=item.url?item.url.replace(/^https?:\/\//,'').split('/')[0]:'';
   return `<div class="item-card type-${item.type||'note'}" onclick="openItem('${item.id}')">
     <div class="card-top">
       <div style="min-width:0;flex:1;">
@@ -492,49 +455,58 @@ function cardHTML(item) {
 }
 
 function renderTags() {
-  const all = new Set();
-  items.forEach(i=>(i.tags||[]).forEach(t=>all.add(t)));
-  const bar = document.getElementById('tags-bar');
-  if (!all.size) { bar.innerHTML=''; return; }
-  bar.innerHTML = [...all].sort().map(t=>`<button class="tag-pill ${activeTag===t?'active':''}" onclick="toggleTag('${t}')">${esc(t)}</button>`).join('');
+  const all=new Set(); items.forEach(i=>(i.tags||[]).forEach(t=>all.add(t)));
+  const bar=document.getElementById('tags-bar');
+  if (!all.size){bar.innerHTML='';return;}
+  bar.innerHTML=[...all].sort().map(t=>`<button class="tag-pill ${activeTag===t?'active':''}" onclick="toggleTag('${t}')">${esc(t)}</button>`).join('');
 }
 
-function toggleTag(tag) { activeTag = activeTag===tag?null:tag; renderAll(); }
-function openItem(id) { const item=items.find(i=>i.id===id); if(!item)return; if(item.url)window.open(item.url,'_blank'); else editItem(id); }
-function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function toggleTag(tag){activeTag=activeTag===tag?null:tag;renderAll();}
+function openItem(id){const item=items.find(i=>i.id===id);if(!item)return;if(item.url)window.open(item.url,'_blank');else editItem(id);}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
-// ── MANUAL MODAL ─────────────────────────────────────────────
-function openModal(item=null) {
-  editingId = item?item.id:null;
-  document.getElementById('modal-title').textContent = item?'Edit item':'New item';
-  document.getElementById('input-url').value = item?.url||'';
-  document.getElementById('input-title').value = item?.title||'';
-  document.getElementById('input-note').value = item?.note||'';
-  document.getElementById('input-tags').value = (item?.tags||[]).join(', ');
+// ── MODAL ────────────────────────────────────────────────────
+function openModal(item=null){
+  editingId=item?item.id:null;
+  document.getElementById('modal-title').textContent=item?'Edit item':'New item';
+  document.getElementById('input-url').value=item?.url||'';
+  document.getElementById('input-title').value=item?.title||'';
+  document.getElementById('input-note').value=item?.note||'';
+  document.getElementById('input-tags').value=(item?.tags||[]).join(', ');
   setType(item?.type||'link');
   document.getElementById('modal').classList.add('open');
 }
-function closeModal() { document.getElementById('modal').classList.remove('open'); editingId=null; }
-function setType(type) {
+function closeModal(){document.getElementById('modal').classList.remove('open');editingId=null;}
+function setType(type){
   activeType=type;
   document.getElementById('type-link').className='type-btn'+(type==='link'?' active':'');
   document.getElementById('type-note').className='type-btn'+(type==='note'?' active':'');
   document.getElementById('url-group').style.display=type==='link'?'block':'none';
 }
-async function saveItem() {
+async function saveItem(){
   const url=document.getElementById('input-url').value.trim();
   const title=document.getElementById('input-title').value.trim();
   const note=document.getElementById('input-note').value.trim();
   const tags=document.getElementById('input-tags').value.trim().split(',').map(t=>t.trim()).filter(Boolean);
   const btn=document.getElementById('save-btn');
   btn.disabled=true; btn.textContent='Saving...';
-  if(editingId){const idx=items.findIndex(i=>i.id===editingId);if(idx>-1)items[idx]={...items[idx],url,title,note,tags,type:activeType};}
-  else items.push({id:Date.now().toString(36)+Math.random().toString(36).slice(2),type:activeType,url,title,note,tags,created:new Date().toISOString()});
-  closeModal();renderAll();await saveToDrive();showToast(editingId?'Updated':'Saved');
+  if(editingId){
+    await api('PATCH',{id:editingId,url,title,note,tags,type:activeType});
+    const idx=items.findIndex(i=>i.id===editingId);
+    if(idx>-1)items[idx]={...items[idx],url,title,note,tags,type:activeType};
+  } else {
+    const res=await api('POST',{type:activeType,url,title,note,tags});
+    items.push(res.item);
+  }
+  closeModal();renderAll();showToast(editingId?'Updated':'Saved');
   btn.disabled=false;btn.textContent='Save';
 }
 function editItem(id){const item=items.find(i=>i.id===id);if(item)openModal(item);}
-async function deleteItem(id){items=items.filter(i=>i.id!==id);renderAll();await saveToDrive();showToast('Removed');}
+async function deleteItem(id){
+  await api('DELETE',null,'?id='+id);
+  items=items.filter(i=>i.id!==id);
+  renderAll();showToast('Removed');
+}
 
 // ── TOAST ────────────────────────────────────────────────────
 let tt;
@@ -550,43 +522,15 @@ document.getElementById('ai-input')?.addEventListener('keydown',e=>{
 
 // ── INIT ─────────────────────────────────────────────────────
 window.addEventListener('load',()=>{
-  if(tryAutoAuth()){
-    showApp();
-    const s=document.createElement('script');
-    s.src='https://accounts.google.com/gsi/client';
-    s.onload=async()=>{await initDrive();checkURLParams();};
-    document.head.appendChild(s);
+  const saved=sessionStorage.getItem('mm_key');
+  if(saved){
+    apiSecret=saved;
+    fetch(WORKER,{headers:{'Authorization':'Bearer '+saved}})
+      .then(r=>r.json())
+      .then(d=>{items=d.items||[];showApp();})
+      .catch(()=>{}); // stay on pin screen if fails
   }
 });
-
-function checkURLParams(){
-  const params=new URLSearchParams(window.location.search);
-  const encoded=params.get('add');
-  if(encoded){
-    try{
-      const item=JSON.parse(atob(encoded));
-      pendingAction={type:'SAVE',item};
-      showResponse(`
-        <div style="margin-bottom:10px;">Save this?</div>
-        <div style="font-size:12px;margin-bottom:4px;"><strong>${esc(item.title)}</strong></div>
-        ${item.url?`<div style="font-size:11px;color:var(--accent);margin-bottom:4px;font-family:monospace;">${esc(item.url)}</div>`:''}
-        ${item.note?`<div style="font-size:12px;color:var(--muted);margin-bottom:6px;">${esc(item.note)}</div>`:''}
-        <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:10px;">${(item.tags||[]).map(t=>`<span class="card-tag">${esc(t)}</span>`).join('')}</div>
-        <div class="confirm-actions">
-          <button class="btn-yes" onclick="confirmAction()">save</button>
-          <button class="btn-no" onclick="cancelAction()">discard</button>
-        </div>
-      `);
-    }catch(e){console.error(e);}
-    window.history.replaceState({},'',window.location.pathname);
-  }
-  const sq=params.get('search');
-  if(sq){
-    document.getElementById('ai-input').value='find '+sq;
-    handleInput();
-    window.history.replaceState({},'',window.location.pathname);
-  }
-}
 </script>
 </body>
 </html>
