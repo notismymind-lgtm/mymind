@@ -619,33 +619,33 @@ window.addEventListener('load',()=>{
 
 
 function checkURLParams(){
-  const params=new URLSearchParams(window.location.search);
-  const sq=params.get('search');
+  // Read from sessionStorage (saved before URL was cleared)
+  const sq = sessionStorage.getItem('mm_pending_search');
   if(sq){
+    sessionStorage.removeItem('mm_pending_search');
     const inputEl=document.getElementById('ai-input');
     inputEl.value=sq;
-    window.history.replaceState({},'',window.location.pathname);
     setTimeout(()=>handleInput(),300);
+    return;
   }
-  const encoded=params.get('add');
-  if(encoded){
-    try{
-      const item=JSON.parse(atob(encoded));
-      pendingAction={type:'SAVE',item};
-      showResponse(`
-        <div style="margin-bottom:10px;">Save this?</div>
-        <div style="font-size:13px;font-weight:500;margin-bottom:3px;">${esc(item.title)}</div>
-        ${item.url?`<div style="font-size:11px;color:var(--accent);margin-bottom:4px;font-family:monospace;">${esc(item.url)}</div>`:''}
-        ${item.note?`<div style="font-size:12px;color:var(--muted);margin-bottom:8px;">${esc(item.note)}</div>`:''}
-        <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:10px;">${(item.tags||[]).map(t=>`<span class="card-tag">${esc(t)}</span>`).join('')}</div>
-        <div class="confirm-actions">
-          <button class="btn-yes" onclick="confirmAction()">save</button>
-          <button class="btn-no" onclick="cancelAction()">discard</button>
-        </div>
-      `);
-    }catch(e){console.error(e);}
-    window.history.replaceState({},'',window.location.pathname);
-  }
+  const encoded = sessionStorage.getItem('mm_pending_add');
+  if(!encoded) return;
+  sessionStorage.removeItem('mm_pending_add');
+  try{
+    const item=JSON.parse(atob(encoded));
+    pendingAction={type:'SAVE',item};
+    showResponse(`
+      <div style="margin-bottom:10px;">Save this?</div>
+      <div style="font-size:13px;font-weight:500;margin-bottom:3px;">${esc(item.title)}</div>
+      ${item.url?`<div style="font-size:11px;color:var(--accent);margin-bottom:4px;font-family:monospace;">${esc(item.url)}</div>`:''}
+      ${item.note?`<div style="font-size:12px;color:var(--muted);margin-bottom:8px;">${esc(item.note)}</div>`:''}
+      <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:10px;">${(item.tags||[]).map(t=>`<span class="card-tag">${esc(t)}</span>`).join('')}</div>
+      <div class="confirm-actions">
+        <button class="btn-yes" onclick="confirmAction()">save</button>
+        <button class="btn-no" onclick="cancelAction()">discard</button>
+      </div>
+    `);
+  }catch(e){console.error(e);}
 }
 </script>
 </body>
