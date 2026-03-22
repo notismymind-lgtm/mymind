@@ -115,6 +115,16 @@
   #empty { display: none; text-align: center; padding: 4rem 2rem; color: var(--muted); }
   #empty p { font-size: 13px; }
 
+  #search-banner { display: none; background: var(--accent-dim); border: 1px solid rgba(37,99,235,0.15); border-radius: var(--radius); padding: 10px 14px; margin-bottom: 12px; display: none; align-items: center; justify-content: space-between; gap: 10px; }
+  #search-banner.on { display: flex; }
+  .search-banner-text { font-size: 12px; color: var(--accent); font-weight: 500; }
+  .btn-clear-search { background: none; border: 1px solid rgba(37,99,235,0.3); color: var(--accent); padding: 4px 10px; border-radius: 5px; font-family: var(--font); font-size: 11px; cursor: pointer; transition: all 0.15s; white-space: nowrap; }
+  .btn-clear-search:hover { background: var(--accent); color: #fff; }
+  #results-banner { display: none; background: var(--accent-dim); border: 1px solid rgba(37,99,235,0.2); border-radius: var(--radius); padding: 10px 14px; margin-bottom: 12px; font-size: 13px; color: var(--accent); display: none; align-items: center; justify-content: space-between; gap: 10px; }
+  #results-banner.on { display: flex; }
+  .btn-clear { background: none; border: 1px solid rgba(37,99,235,0.3); color: var(--accent); padding: 4px 10px; border-radius: 6px; font-family: var(--font); font-size: 11px; font-weight: 500; cursor: pointer; transition: all 0.15s; white-space: nowrap; }
+  .btn-clear:hover { background: var(--accent); color: #fff; }
+
   .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.25); z-index: 200; align-items: center; justify-content: center; padding: 1rem; }
   .modal-overlay.open { display: flex; }
   .modal { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.4rem; width: 100%; max-width: 460px; max-height: 90vh; overflow-y: auto; box-shadow: 0 8px 32px rgba(0,0,0,0.1); }
@@ -180,6 +190,14 @@
       <div class="list-header">
         <div id="item-count" style="font-size:12px;color:var(--muted);"></div>
         <button class="btn-add" onclick="openModal()">+ add</button>
+      </div>
+      <div id="results-banner">
+        <span id="results-text"></span>
+        <button class="btn-clear" onclick="clearSearch()">clear search</button>
+      </div>
+      <div id="search-banner">
+        <span class="search-banner-text" id="search-banner-text">showing results</span>
+        <button class="btn-clear-search" onclick="clearSearch()">clear search</button>
       </div>
       <div id="items-list"></div>
       <div id="empty"><p>nothing saved yet</p></div>
@@ -385,7 +403,8 @@ async function executeAction(result, inputEl) {
 
   } else if (action === 'SEARCH') {
     const matched = (data.ids||[]).map(id=>items.find(i=>i.id===id)).filter(Boolean);
-    renderAll(matched);
+    const query = inputEl.value.trim();
+    renderAll(matched, query);
     showResponse(`<div>${esc(message)}</div>`);
     setTimeout(clearResponse, 3000);
     inputEl.value = '';
@@ -430,15 +449,31 @@ function showResponse(html) { const el=document.getElementById('ai-response'); e
 function clearResponse() { const el=document.getElementById('ai-response'); el.className='wrap'; el.innerHTML=''; }
 
 // ── RENDER ───────────────────────────────────────────────────
-function renderAll(filteredOverride) {
+function renderAll(filteredOverride, searchQuery) {
   let filtered = filteredOverride || [...items].reverse().filter(i => !activeTag||(i.tags&&i.tags.includes(activeTag)));
   const list = document.getElementById('items-list');
   const empty = document.getElementById('empty');
   const count = document.getElementById('item-count');
+  const banner = document.getElementById('results-banner');
+  const resultsText = document.getElementById('results-text');
   count.textContent = filtered.length + ' item' + (filtered.length!==1?'s':'');
+  if (filteredOverride && searchQuery) {
+    banner.className = 'on';
+    resultsText.textContent = filtered.length + ' result' + (filtered.length!==1?'s':'') + ' for "' + searchQuery + '"';
+  } else {
+    banner.className = '';
+  }
   if (filtered.length===0) { list.innerHTML=''; empty.style.display='block'; }
   else { empty.style.display='none'; list.innerHTML=filtered.map(cardHTML).join(''); }
   renderTags();
+}
+
+function clearSearch() {
+  activeTag = null;
+  document.getElementById('ai-input').value = '';
+  document.getElementById('results-banner').className = '';
+  renderAll();
+  clearResponse();
 }
 
 function cardHTML(item) {
